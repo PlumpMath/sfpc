@@ -1,2 +1,7 @@
-# sfpc-2015
-Radical Computer Science Class at the School For Poetic Computation 2015
+# Radical Computer Science
+## School For Poetic Computation, Fall 2015
+
+> You cannot reach the moon
+> by building a better ladder
+> 
+> — Brett Victor
