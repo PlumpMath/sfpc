@@ -8,4 +8,4 @@ title: Beginnings
 > 
 > — Brett Victor
 
-![](/media/ladder-to-the-moon.jpg)
+![]({{ site.url }}/media/ladder-to-the-moon.jpg)
