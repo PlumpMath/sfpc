@@ -1,0 +1,77 @@
+
+<meta charset="utf-8">
+
+<script src="js/jquery.js"></script>
+<script src="js/jqconsole.js"></script>
+<script src="js/sugar.js"></script>
+<script src="js/peg.js"></script>
+<script src="js/plt.js"></script>
+
+<script type="text/javascript">
+  // uncomment next line to enable refresh
+  // PLT.refresh = true
+
+  // write helper functions and semantics here
+  var sumArray = function(array) {
+    var x = 0;
+    for(var i=0; i<array.length; i++) {
+      x += array[i];
+    }
+    return x;
+  }
+</script>
+
+<title>Jisp</title>
+
+<!--
+
+PEG syntax quick reference
+
+'x'   : match the literal character 'x'
+x+    : match x 1 or more times
+x*    : match x 0 or more times
+x?    : match x 0 or 1 times
+!x    : match anything but the match x
+x/y   : match x or y, trying in that order
+[xyz] : match one of the literal character 'x', 'y', or 'z'
+v:x   : assign the result of the match x to the variable v
+
+Full documentation: http://pegjs.majda.cz/documentation#grammar-syntax-and-semantics-parsing-expression-types
+
+-->
+<grammar>
+  start           = space e:(math / number) space { return e }
+  
+  math            = addition
+  addition        = '(' '+' a:start* ')'{ return sumArray(a); }
+  
+  number = d:digit+ { return parseInt( d.join('') ) }
+  digit  = [0123456789]
+
+  space  = ' '*
+</grammar>
+
+<h3>Alert</h3>
+<code>(alert "Hello!")</code>
+
+<h3>Math Expressions</h3>
+<code expect="0.8509035245341184">(Math.sin 45)</code>
+<code expect="4">(Math.floor 4.5)</code>
+
+<h3>Date Expressions</h3>
+<p><em>Can't have an expected value because it will be different every time, but should look something like "Thu Oct 22 2015 00:30:02 GMT-0700 (PDT)" </em></p>
+<code>(Date)</code>
+
+<h3>Nested Expressions</h3>
+<code>(Math.sin (Math.cos (+ 4 20)))</code>
+<code>(alert "The date is " (Date))</code>
+
+<h3>Math Constants</h3>
+<p><em>The challenge here is differentiating between functions and constants</em></p>
+<code expect="3.141592653589793">Math.PI</code>
+<code expect="-1">(Math.cos Math.PI)</code>
+
+<h4>Math Expressions — Abbreviated<h4>
+<p><em>Trigger the same functions using shorter names</em></p>
+<code expect="0.8509035245341184">(sin 45)</code>
+<code expect="4">(floor 4.5)</code>
