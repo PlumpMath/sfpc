@@ -1,0 +1,111 @@
+
+<meta charset="utf-8">
+
+<script src="js/jquery.js"></script>
+<script src="js/jqconsole.js"></script>
+<script src="js/sugar.js"></script>
+<script src="js/peg.js"></script>
+<script src="js/plt.js"></script>
+
+<script type="text/javascript">
+  // uncomment next line to enable refresh
+  // PLT.refresh = true
+
+  // write helper functions and semantics here
+  var sumArray = function(array) {
+    var x = 0;
+    for(var i=0; i<array.length; i++) {
+      x += array[i];
+    }
+    return x;
+  }
+  
+  var greet = function(text) {
+    return "Hello " + text;
+  }
+  
+  var lookupFunction = function(functionName) {
+    return eval('window.' + functionName);
+  }
+  
+  var doesFunctionExist = function(functionName) {
+    return typeof lookupFunction(functionName) == 'function';
+  }
+  
+  var JispEval = function(ast) {
+    if(doesFunctionExist(ast.parens.symbol)) {
+      var functionToCall = lookupFunction(ast.parens.symbol);
+      return functionToCall.apply(null, ast.arguments);
+      
+    } else {
+      return {error: ast.parens.symbol + " not found!"}
+      
+    }
+  }
+</script>
+
+<title>Jisp</title>
+
+<!--
+
+PEG syntax quick reference
+
+'x'   : match the literal character 'x'
+x+    : match x 1 or more times
+x*    : match x 0 or more times
+x?    : match x 0 or 1 times
+!x    : match anything but the match x
+x/y   : match x or y, trying in that order
+[xyz] : match one of the literal character 'x', 'y', or 'z'
+v:x   : assign the result of the match x to the variable v
+
+Full documentation: http://pegjs.majda.cz/documentation#grammar-syntax-and-semantics-parsing-expression-types
+
+-->
+<grammar>
+  start           = space e:(parens / number) space { return e }
+  
+  expression      = string / number / parens / symbol
+  
+  // anything in (parens)
+  parens          = '(' space s:symbol space a:argument* space ')'
+                  { return JispEval({parens:s, arguments:a}) }   // use this line to actually evaluate the code using JispEval
+                  // { return {parens:s, arguments:a} }             // use this line to see what is being parsed
+  symbol          = s:[^ ()]+ { return {symbol: s.join("")} }
+  argument        = e:expression space { return e }
+  
+  string          = '"' a:[^"]* '"' { return a.join("") }
+    
+  number = d:digit+ { return parseInt( d.join('') ) }
+  digit  = [0123456789]
+
+  space  = ' '*
+</grammar>
+
+<h3>JavaScript Functions</h3>
+<code>(aler (Math.sin 45))</code>
+<code>(Math.min 6 5)</code>
+<code>(Math.max 6 5)</code>
+<code>(Math.maxx 6 5)</code>
+<code>(greet "Everyone")</code>
+<code>(Math.sin 45)</code>
+<code>(Math.floor 4.5)</code>
+
+<h3>Operators</h3>
+<p>JavaScript treats operators differently from functions. Update JispEval to support them.</p>
+<code expect="9">(+ 4 5)</code>
+<code expect="20">(* 4 5)</code>
+<code expect="15">(+ 4 5 6)</code>
+<code expect="true">(< 8 9)</code>
+<code expect="false">(> 8 9)</code>
+<code expect="true">(and (< 8 9) (< 1 9))</code>
+<code expect="false">(and (< 8 9) (< 10 9))</code>
+<code expect="true">(or (< 8 9) (< 10 9))</code>
+<code expect="false">(or (< 18 9) (< 10 9))</code>
+
+<h3>Advanced — Conditionals</h3>
+<code expect='"hello"'>(if (< 8 9) "hello" "world")</code>
+<code expect='"world"'>(if (> 8 9) "hello" "world")</code>
+
+<h3>Advanced — Loops</h3>
+<p>How would you design looping syntax in this language?</p>
